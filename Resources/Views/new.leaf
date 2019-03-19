@@ -1,0 +1,8 @@
+#set("body") {
+    <form action="/posts" method="post">
+        <input type="text" name="content" placeholder="Content" />
+        <input type="text" name="author" placeholder="Author" />
+        <input type="submit" value="Create new Post"/>
+    </form>
+}
+#embed("base")

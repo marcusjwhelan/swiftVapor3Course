@@ -1,10 +1,20 @@
 import FluentSQLite
 import Vapor
+import Leaf
+import Authentication
 
 /// Called before your application initializes.
 public func configure(_ config: inout Config, _ env: inout Environment, _ services: inout Services) throws {
     // Register providers first
     try services.register(FluentSQLiteProvider())
+
+    // add leaf provider
+    try services.register(LeafProvider())
+    config.prefer(LeafRenderer.self, for: ViewRenderer.self)
+
+    // add auth service
+    try services.register(AuthenticationProvider())
+
 
     // Register routes to the router
     let router = EngineRouter.default()
@@ -17,8 +27,12 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
     middlewares.use(ErrorMiddleware.self) // Catches errors and converts to HTTP response
     services.register(middlewares)
 
-    // Configure a SQLite database
-    let sqlite = try SQLiteDatabase(storage: .memory)
+    // Configure a SQLite database.. in memory
+    // let sqlite = try SQLiteDatabase(storage: .memory)
+    // configure SQLIte not for in mem
+    let directoryConfig = DirectoryConfig.detect() // access to this directory?
+    services.register(directoryConfig)
+    let sqlite = try SQLiteDatabase(storage: .file(path: "\(directoryConfig.workDir)MiniPost.db"))
 
     // Register the configured SQLite database to the database config.
     var databases = DatabasesConfig()
@@ -27,6 +41,9 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
 
     // Configure migrations
     var migrations = MigrationConfig()
-    migrations.add(model: Todo.self, database: .sqlite)
+    migrations.add(model: Post.self, database: .sqlite)
+    migrations.add(model: User.self, database: .sqlite)
+    migrations.add(model: Token.self, database: .sqlite)
     services.register(migrations)
+    User.PublicUser.defaultDatabase = .sqlite
 }
