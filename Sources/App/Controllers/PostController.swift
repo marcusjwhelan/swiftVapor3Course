@@ -54,10 +54,19 @@ final class PostController: RouteCollection {
 
     // Delete /posts/:id
     func destroy(_ req: Request) throws -> Future<HTTPStatus> {
+        // used to used flatMap wich made this return a Future<> hence the return type above
+        // now Map so we can just return an HttpStatus
         return try req.parameters.next(Post.self)
-                .flatMap(to: HTTPStatus.self) { (post: Post) in
-                    return post.delete(on: req)
-                            .transform(to: .noContent) // http sends back no content
+                .map(to: HTTPStatus.self) { (post: Post) in
+                    // should check that this user is only deleting his posts
+                    let user = try req.requireAuthenticated(User.self)
+                    if post.authorID == user.id! {
+                        try post.delete(on: req).wait()
+                        return HTTPStatus.noContent
+                    } else {
+                        return HTTPStatus.badRequest
+                    }
+                    // old return post.delete(on: req).transform(to: .noContent) // http sends back no content
                 }
     }
 

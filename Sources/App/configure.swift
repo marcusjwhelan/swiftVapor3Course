@@ -38,9 +38,22 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
     let db: MySQLDatabase
 
     if env.isRelease {
-        let dbUrl = Environment.get("URL KEY IN HEROKU")
+        // get the environment variables set on the server
+        // given their key names
+        let port = Environment.get("PORT")
+        let hostName = Environment.get("HOST")
+        let username = Environment.get("USERNAME")
+        let password = Environment.get("PASSWORD")
+        let database = Environment.get("DB")
+        let portValue = Int(port)!
         // mysql prod
-        let d = try MySQLDatabaseConfig(url: dbUrl!)!
+        let d = MySQLDatabaseConfig(
+                hostname: hostName,
+                port: portValue,
+                username: username,
+                password: password,
+                database: database
+        )
         db = MySQLDatabase(config: d)
     } else {
         // mysql dev
