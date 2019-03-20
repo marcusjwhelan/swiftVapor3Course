@@ -1,6 +1,6 @@
 import Vapor
 import Foundation
-import FluentSQLite
+import FluentMySQL
 import Authentication
 
 final class User: Content {
@@ -40,12 +40,12 @@ extension User {
 
 // make public user is like regular user
 // don't need to include migration
-extension User.PublicUser: SQLiteModel {
+extension User.PublicUser: MySQLModel {
     public static let entity: String = User.entity
 }
 extension User.PublicUser: Parameter {}
 
-extension User: SQLiteModel {}
+extension User: MySQLModel {}
 extension User: Parameter {}
 extension User: Migration {}
 

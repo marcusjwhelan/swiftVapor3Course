@@ -1,7 +1,7 @@
 import Vapor
 import Foundation
 import Authentication
-import FluentSQLite
+import FluentMySQL
 import Random
 import Crypto
 
@@ -23,7 +23,7 @@ final class Token: Content {
     }
 }
 
-extension Token: SQLiteModel {}
+extension Token: MySQLModel {}
 extension Token: Migration {}
 
 // add relationship to user

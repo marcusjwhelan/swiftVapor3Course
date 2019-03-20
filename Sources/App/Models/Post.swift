@@ -1,6 +1,6 @@
 import Vapor
 import Foundation
-import FluentSQLite
+import FluentMySQL
 
 
 final class Post: Content {
@@ -26,6 +26,6 @@ extension Post {
     }
 }
 
-extension Post: SQLiteModel {}
+extension Post: MySQLModel {}
 extension Post: Migration {}
 extension Post: Parameter {} // needed for get /posts/:id

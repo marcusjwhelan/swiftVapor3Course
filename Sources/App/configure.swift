@@ -1,4 +1,4 @@
-import FluentSQLite
+import FluentMySQL
 import Vapor
 import Leaf
 import Authentication
@@ -6,7 +6,8 @@ import Authentication
 /// Called before your application initializes.
 public func configure(_ config: inout Config, _ env: inout Environment, _ services: inout Services) throws {
     // Register providers first
-    try services.register(FluentSQLiteProvider())
+    // try services.register(FluentSQLiteProvider())
+    try services.register(FluentMySQLProvider())
 
     // add leaf provider
     try services.register(LeafProvider())
@@ -32,18 +33,33 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
     // configure SQLIte not for in mem
     let directoryConfig = DirectoryConfig.detect() // access to this directory?
     services.register(directoryConfig)
-    let sqlite = try SQLiteDatabase(storage: .file(path: "\(directoryConfig.workDir)MiniPost.db"))
 
+    // mysql
+    let db = MySQLDatabaseConfig(
+            hostname: "127.0.0.1",
+            port: 3306,
+            username: "marcus",
+            password: "marcus",
+            database: "MiniPost"
+    )
+    services.register(db)
+    // sqlite
     // Register the configured SQLite database to the database config.
-    var databases = DatabasesConfig()
-    databases.add(database: sqlite, as: .sqlite)
-    services.register(databases)
+    // var databases = DatabasesConfig()
+    // databases.add(database: db, as: .mysql)
+    // let sqlite = try SQLiteDatabase(storage: .file(path: "\(directoryConfig.workDir)MiniPost.db"))
+    // databases.add(database: sqlite, as: .sqlite)
+    // services.register(databases)
 
     // Configure migrations
     var migrations = MigrationConfig()
-    migrations.add(model: Post.self, database: .sqlite)
-    migrations.add(model: User.self, database: .sqlite)
-    migrations.add(model: Token.self, database: .sqlite)
+    // migrations.add(model: Post.self, database: .sqlite)
+    migrations.add(model: Post.self, database: .mysql)
+    // migrations.add(model: User.self, database: .sqlite)
+    migrations.add(model: User.self, database: .mysql)
+    // migrations.add(model: Token.self, database: .sqlite)
+    migrations.add(model: Token.self, database: .mysql)
     services.register(migrations)
-    User.PublicUser.defaultDatabase = .sqlite
+    // User.PublicUser.defaultDatabase = .sqlite
+    User.PublicUser.defaultDatabase = .mysql
 }
