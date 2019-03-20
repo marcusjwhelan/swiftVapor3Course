@@ -17,10 +17,13 @@ final class UserController: RouteCollection {
         // users/:id/posts
         usersRouter.get(User.PublicUser.parameter, "posts", use: showPosts)
 
+        usersRouter.post("login", use: loginHandler)
+
+
         // middleware
-        let basicAuthMiddleware = User.basicAuthMiddleware(using: BCryptDigest())
-        let authGroup = usersRouter.grouped(basicAuthMiddleware)
-        authGroup.post("login", use: loginHandler)
+        // let basicAuthMiddleware = User.basicAuthMiddleware(using: BCryptDigest())
+        // let authGroup = usersRouter.grouped(basicAuthMiddleware)
+        // authGroup.post("login", use: loginHandler) should be on the regular user router not blocked by auth
 
         let tokenAuthMiddleware = User.tokenAuthMiddleware()
         let tokenGroup = usersRouter.grouped(tokenAuthMiddleware)

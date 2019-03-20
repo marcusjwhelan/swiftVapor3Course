@@ -34,14 +34,25 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
     let directoryConfig = DirectoryConfig.detect() // access to this directory?
     services.register(directoryConfig)
 
-    // mysql
-    let db = MySQLDatabaseConfig(
-            hostname: "127.0.0.1",
-            port: 3306,
-            username: "marcus",
-            password: "marcus",
-            database: "MiniPost"
-    )
+    // create db based on env
+    let db: MySQLDatabaseConfig
+
+    if env.isRelease {
+        let dbUrl = Environment.get("URL KEY IN HEROKU")
+        // mysql prod
+        let d = try MySQLDatabaseConfig(url: dbUrl!)!
+        db = d
+    } else {
+        // mysql dev
+        db = MySQLDatabaseConfig(
+                hostname: "127.0.0.1",
+                port: 3306,
+                username: "marcus",
+                password: "marcus",
+                database: "MiniPost"
+        )
+    }
+
     services.register(db)
     // sqlite
     // Register the configured SQLite database to the database config.
