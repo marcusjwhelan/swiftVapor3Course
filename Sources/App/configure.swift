@@ -35,22 +35,23 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
     services.register(directoryConfig)
 
     // create db based on env
-    let db: MySQLDatabaseConfig
+    let db: MySQLDatabase
 
     if env.isRelease {
         let dbUrl = Environment.get("URL KEY IN HEROKU")
         // mysql prod
         let d = try MySQLDatabaseConfig(url: dbUrl!)!
-        db = d
+        db = MySQLDatabase(config: d)
     } else {
         // mysql dev
-        db = MySQLDatabaseConfig(
+        let d = MySQLDatabaseConfig(
                 hostname: "127.0.0.1",
                 port: 3306,
                 username: "marcus",
                 password: "marcus",
                 database: "MiniPost"
         )
+        db = MySQLDatabase(config: d)
     }
 
     services.register(db)
